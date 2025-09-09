@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Salario Neto Costa Rica</title>
     <style>
         /* Reset básico */
@@ -212,9 +213,9 @@
         <strong>Total de Deducciones:</strong> ${format(isr_salario + ccss_salario)} <br/>
         <strong>Salario neto:</strong> ${format(salario_neto)} <br/>
         ${bono_neto ? `<strong>Bono neto:</strong> ${format(bono_neto)} <br/>` : ""}
-        <strong>Quincena del 15 (sin home office):</strong> ${format(salario_neto / 2)} <br/>
-        <strong>Quincena del 30 (con home office):</strong> ${format(salario_neto / 2 + home_office)} <br/>
-        ${bono_neto ? `<strong>Quincena del 30 (con home office + bono):</strong> ${format(salario_neto / 2 + home_office + bono_neto)} <br/>` : ""}
+        <strong>Quincena (sin home office):</strong> ${format(salario_neto / 2)} <br/>
+        <strong>Quincena (con home office):</strong> ${format(salario_neto / 2 + home_office)} <br/>
+        ${bono_neto ? `<strong>Quincena (con home office + bono):</strong> ${format(salario_neto / 2 + home_office + bono_neto)} <br/>` : ""}
       `;
         }
     </script>
