@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Calculadora de Salario Neto Costa Rica</title>
+    <style>
+        /* Reset básico */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 2rem;
+            min-height: 100vh;
+            color: #2f3640;
+        }
+
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            color: #1e272e;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            line-height: 1.3;
+        }
+
+        h1 span {
+            color: #0097e6;
+            font-weight: 700;
+        }
+
+        div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            color: #2f3640;
+            width: 100%;
+        }
+
+        input[type="number"] {
+            padding: 0.5rem 0.8rem;
+            margin-top: 0.3rem;
+            border: 1px solid #dcdde1;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.2s;
+            width: 100%;
+        }
+
+        input[type="number"]:focus {
+            border-color: #0097e6;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 151, 230, 0.3);
+        }
+
+        button {
+            padding: 0.6rem 1.2rem;
+            background-color: #0097e6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 0.5rem;
+            width: 100%;
+            max-width: 100px;
+        }
+
+        button:hover {
+            background-color: #0984e3;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            padding: 1rem 1.2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 450px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .result strong {
+            color: #192a56;
+        }
+
+        /* Media Queries para móviles */
+        @media (max-width: 500px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            input[type="number"],
+            button {
+                font-size: 0.95rem;
+            }
+
+            .result {
+                font-size: 0.9rem;
+                padding: 0.8rem 1rem;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div>
+        <h1>Calculadora de <span>Salario Neto</span>, Quincenas y Bono</h1>
+
+        <label>Salario Bruto (₡):
+            <input id="salario_bruto" type="number" value="" />
+        </label>
+        <label>Home Office (₡):
+            <input id="home_office" type="number" value="" />
+        </label>
+        <label>Bono (₡):
+            <input id="bono_bruto" type="number" value="" />
+        </label>
+        <button onclick="calcular()">Calcular</button>
+    </div>
+
+    <div id="salida" class="result" style="display:none"></div>
+
+    <script>
+        function format(n) {
+            return new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC', maximumFractionDigits: 2 }).format(n);
+        }
+
+
+        // Calcular impuesto sobre la renta según tramos
+        function calcularISR(salarioBruto) {
+            let isr = 0;
+            if (salarioBruto > 4745000) {
+                isr += (salarioBruto - 4745000) * 0.25;
+                salarioBruto = 4745000;
+            }
+            if (salarioBruto > 2373000) {
+                isr += (salarioBruto - 2373000) * 0.20;
+                salarioBruto = 2373000;
+            }
+            if (salarioBruto > 1352000) {
+                isr += (salarioBruto - 1352000) * 0.15;
+                salarioBruto = 1352000;
+            }
+            if (salarioBruto > 922000) {
+                isr += (salarioBruto - 922000) * 0.10;
+            }
+            return isr;
+        }
+
+        function calcular() {
+            const salario_bruto = Number(document.getElementById('salario_bruto').value) || 0;
+            const bono_bruto = Number(document.getElementById('bono_bruto').value) || 0;
+            const home_office = Number(document.getElementById('home_office').value) || 0;
+            if (salario_bruto <= 0) {
+                const salida = document.getElementById('salida');
+                salida.style.display = 'block';
+                salida.innerHTML = `<span style="color:red; font-weight:600;">El salario bruto debe ser mayor a ${format(0)}</span>`;
+                return; // detiene la función
+            }
+
+            const ccss_salario = salario_bruto * 0.1067;
+            const isr_salario = calcularISR(salario_bruto);
+            const salario_neto = salario_bruto - (ccss_salario + isr_salario);
+
+            const bono_salario_bruto = salario_bruto + bono_bruto;
+            const ccss_bono_salario = bono_salario_bruto * 0.1067;
+            const isr_bono_salario = calcularISR(bono_salario_bruto);
+            const bono_salario_neto = bono_salario_bruto - (ccss_bono_salario + isr_bono_salario);
+
+            const bono_neto = bono_salario_neto - salario_neto
+
+            const salida = document.getElementById('salida');
+            salida.style.display = 'block';
+            salida.innerHTML = `
+        <strong>Salario bruto:</strong> ${format(salario_bruto)} <br/>
+        <strong>Impuesto sobre la Renta:</strong> ${format(isr_salario)} <br/>
+        <strong>CCSS (10,67%):</strong> ${format(ccss_salario)} <br/>
+        <strong>Total de Deducciones:</strong> ${format(isr_salario + ccss_salario)} <br/>
+        <strong>Salario neto:</strong> ${format(salario_neto)} <br/>
+        ${bono_neto ? `<strong>Bono neto:</strong> ${format(bono_neto)} <br/>` : ""}
+        <strong>Quincena del 15 (sin home office):</strong> ${format(salario_neto / 2)} <br/>
+        <strong>Quincena del 30 (con home office):</strong> ${format(salario_neto / 2 + home_office)} <br/>
+        ${bono_neto ? `<strong>Quincena del 30 (con home office + bono):</strong> ${format(salario_neto / 2 + home_office + bono_neto)} <br/>` : ""}
+      `;
+        }
+    </script>
+</body>
+
+</html>
